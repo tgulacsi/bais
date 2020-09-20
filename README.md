@@ -24,10 +24,11 @@ For example:
 ```
   var b = new byte[] { 67, 97, 116, 128, 10, 69, 255, 65, 66, 67, 68 };
   Assert.AreEqual(ByteArrayInString.Convert(b), "Cat\b`@iE?tEB!CD");
-</pre>
+```
+
 A byte sequence such as 128, 10, 69, 255 can be encoded in base 64 as 
 illustrated:
-<pre>
+```
              ---128---    ---10----    ---69----  ---255---  
   Bytes:     1000 0000    0000 1010    0100 0101  1111 1111  
   Base 64:   100000   000000   101001    000101   111111   110000
