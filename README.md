@@ -1,5 +1,6 @@
-# bais
-Go implemenation of ByteArrayInString
+# ByteArrayInString
+
+## Go implemenation of ByteArrayInString
 
 Encodes and decodes BAIS (Byte Array In String) encoding,
 which preserves runs of ASCII characters unchanged. This encoding is
