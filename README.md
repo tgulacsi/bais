@@ -22,7 +22,8 @@ character is encountered. Base-64 mode ends, returning to ASCII, when a
 For example:
 ```
   var b = new byte[] { 67, 97, 116, 128, 10, 69, 255, 65, 66, 67, 68 };
-  Assert.AreEqual(ByteArrayInString.Convert(b), "Cat\b`@iE?tEB!CD");
+  bais.Encode(b) == "Cat\b`@iE?tEB!CD"
+  bais.Decode("Cat\b`@iE?tEB!CD") == b
 </pre>
 A byte sequence such as 128, 10, 69, 255 can be encoded in base 64 as 
 illustrated:
