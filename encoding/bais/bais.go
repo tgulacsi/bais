@@ -61,10 +61,6 @@ type IndexOutOfBoundsError struct {
 	arrayLength int
 }
 
-func (ioobe IndexOutOfBoundsError) Error() string {
-	panic(fmt.Sprintf("%d is not a valid index[0,%d] for the array", ioobe.index, ioobe.arrayLength))
-}
-
 func Encode(ba *[]byte, allowControlCharacters bool) string {
 	bytes := *ba
 	arrayLength := len(bytes)
@@ -87,22 +83,22 @@ func Encode(ba *[]byte, allowControlCharacters bool) string {
 					if i < arrayLength {
 						b, i = getByte(bytes, i)
 						accum = accum<<8 | int32(b)
-						sb = append(sb, byte(encodeBase64Digit(accum>>18)))
-						sb = append(sb, byte(encodeBase64Digit(accum>>12)))
-						sb = append(sb, byte(encodeBase64Digit(accum>>6)))
-						sb = append(sb, byte(encodeBase64Digit(accum)))
+						sb = append(sb, byte(encode(accum>>18)))
+						sb = append(sb, byte(encode(accum>>12)))
+						sb = append(sb, byte(encode(accum>>6)))
+						sb = append(sb, byte(encode(accum)))
 						if i >= arrayLength {
 							break
 						}
 					} else {
-						sb = append(sb, byte(encodeBase64Digit(accum>>10)))
-						sb = append(sb, byte(encodeBase64Digit(accum>>4)))
-						sb = append(sb, byte(encodeBase64Digit(accum<<2)))
+						sb = append(sb, byte(encode(accum>>10)))
+						sb = append(sb, byte(encode(accum>>4)))
+						sb = append(sb, byte(encode(accum<<2)))
 						break
 					}
 				} else {
-					sb = append(sb, byte(encodeBase64Digit(accum>>2)))
-					sb = append(sb, byte((encodeBase64Digit(accum << 4))))
+					sb = append(sb, byte(encode(accum>>2)))
+					sb = append(sb, byte((encode(accum << 4))))
 					break
 				}
 				if isAscii(bytes, i, allowControlCharacters) &&
@@ -117,7 +113,7 @@ func Encode(ba *[]byte, allowControlCharacters bool) string {
 	return string(sb[0:])
 }
 
-func encodeBase64Digit(b int32) int32 {
+func encode(b int32) int32 {
 	return (b+1)&63 + 63
 }
 
@@ -126,7 +122,7 @@ func Decode(s string) ([]byte, error) {
 	sb := []byte(s)
 	for i := 0; i < len(sb); i++ {
 		if sb[i] == '\b' {
-			i++ // skip \b
+			i++ // skip \b (backspace)
 			for {
 				cur := int32(sb[i]) & 0xFF
 				if i >= len(sb) {
@@ -162,7 +158,7 @@ func Decode(s string) ([]byte, error) {
 					return []byte{}, fmt.Errorf(`%d & 0xFF00 != 0`, accum)
 				}
 				if i < len(sb) && sb[i] != '!' {
-					return []byte{}, fmt.Errorf(`%s expecting '!' got %d`, sb[i])
+					return []byte{}, fmt.Errorf(`expecting '!' got %d`, sb[i])
 				}
 				i++
 
