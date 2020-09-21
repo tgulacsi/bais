@@ -23,12 +23,24 @@ func Test_Encode(t *testing.T) {
 		want string
 	}{
 		{
-			name: "ABC",
+			name: "all ascii",
 			args: args{
-				ba:                     stringToByteArrayPointer("ABC"),
+				ba: func() *[]byte {
+					bytes := make([]byte, 64)
+					for i := 63; i < 127; i++ {
+						bytes[i-63] = byte(i)
+					}
+					return &bytes
+				}(),
 				allowControlCharacters: false,
 			},
-			want: "ABC",
+			want: func() string {
+				bytes := make([]byte, 64)
+				for i := 63; i < 127; i++ {
+					bytes[i-63] = byte(i)
+				}
+				return string(bytes)
+			}(),
 		},
 		{
 			name: "Cat\\b`@iE?tEB!CD",
@@ -79,11 +91,23 @@ func Test_Decode(t *testing.T) {
 		want []byte
 	}{
 		{
-			name: "ABC",
+			name: "all ascii",
 			args: args{
-				s: "ABC",
+				s: func() string {
+					bytes := make([]byte, 64)
+					for i := 63; i < 127; i++ {
+						bytes[i-63] = byte(i)
+					}
+					return string(bytes)
+				}(),
 			},
-			want: []byte("ABC"),
+			want: func() []byte {
+				bytes := make([]byte, 64)
+				for i := 63; i < 127; i++ {
+					bytes[i-63] = byte(i)
+				}
+				return bytes
+			}(),
 		},
 		{
 			name: "Cat\\b`@iE?tEB!CD",
