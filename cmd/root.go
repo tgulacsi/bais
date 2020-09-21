@@ -16,6 +16,7 @@ var rootCmd = &cobra.Command{
 	Use:   "bais",
 	Short: "ByteArrayInString",
 	Long:  `An alternative Base64 encoding that leaves ASCII characters as they are.`,
+	Args:  cobra.MinimumNArgs(2),
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },

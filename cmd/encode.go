@@ -14,14 +14,32 @@ var encodeCmd = &cobra.Command{
 	Short: "bais encode",
 	Run: func(cmd *cobra.Command, args []string) {
 		viper.BindPFlags(cmd.Flags())
-		inputFile := args[0]
-		outputFile := args[1]
-		content, err := ioutil.ReadFile(inputFile)
+		var inputFile *os.File
+		var outputFile *os.File
+		if len(args) == 0 {
+			inputFile = os.Stdin
+			outputFile = os.Stdout
+		}
+		if len(args) >= 1 {
+			inf, err := os.Open(args[0])
+			if err != nil {
+				panic(err)
+			}
+			inputFile = inf
+		}
+		if len(args) == 2 {
+			outf, err := os.Open(args[0])
+			if err != nil {
+				panic(err)
+			}
+			outputFile = outf
+		}
+		content, err := ioutil.ReadAll(inputFile)
 		if err != nil {
 			panic(err)
 		}
 		encoded := bais.Encode(&content, viper.GetBool("allow-control-characters"))
-		err = ioutil.WriteFile(outputFile, []byte(encoded), 0644)
+		_, err = outputFile.Write([]byte(encoded))
 		if err != nil {
 			panic(err)
 		}
