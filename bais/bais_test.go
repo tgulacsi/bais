@@ -1,8 +1,9 @@
 package bais
 
 import (
+	"bytes"
 	"fmt"
-	"reflect"
+	"io/ioutil"
 	"testing"
 )
 
@@ -32,10 +33,30 @@ func Test_Encode(t *testing.T) {
 		{
 			name: "Cat\\b`@iE?tEB!CD",
 			args: args{
-				ba:                     &[]byte{67, 97, 116, 128, 10, 69, 255, 65, 66, 67, 68},
-				allowControlCharacters: true,
+				ba: func() *[]byte {
+					content, err := ioutil.ReadFile("testdata/test.jpg")
+					if err != nil {
+						t.Errorf("Could not read testdata/test.jpg")
+					}
+					return &content
+				}(),
+				allowControlCharacters: false,
 			},
 			want: "Cat\b`@iE?tEB!CD",
+		},
+		{
+			name: "testdata/test.jpg",
+			args: args{
+				ba:                     &[]byte{},
+				allowControlCharacters: false,
+			},
+			want: func() string {
+				want, err := ioutil.ReadFile("testdata/test.jpg.bais")
+				if err != nil {
+					t.Errorf("Could not read testdata/test.jpg.bais")
+				}
+				return string(want)
+			}(),
 		},
 	}
 	for _, tt := range tests {
@@ -71,10 +92,29 @@ func Test_Decode(t *testing.T) {
 			},
 			want: []byte{67, 97, 116, 128, 10, 69, 255, 65, 66, 67, 68},
 		},
+		{
+			name: "test.jpg.bais",
+			args: args{
+				s: func() string {
+					content, err := ioutil.ReadFile("testdata/test.jpg.bais")
+					if err != nil {
+						t.Errorf("Could not read testdata/test.jpg.bais")
+					}
+					return string(content[:])
+				}(),
+			},
+			want: func() []byte {
+				want, err := ioutil.ReadFile("testdata/test.jpg")
+				if err != nil {
+					t.Errorf("Could not read testdata/test.jpg")
+				}
+				return want
+			}(),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := Decode(tt.args.s); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := Decode(tt.args.s); !bytes.Equal(got, tt.want) {
 				t.Errorf("Decode() = %v, want %v", got, tt.want)
 			}
 		})
