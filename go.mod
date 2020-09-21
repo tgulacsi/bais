@@ -1,4 +1,4 @@
-module github.com/jarrodhroberson/bais/bais
+module github.com/jarrodhroberson/bais
 
 go 1.15
 
