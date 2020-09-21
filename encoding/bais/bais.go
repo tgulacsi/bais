@@ -58,11 +58,11 @@ import (
 
 type IndexOutOfBoundsError struct {
 	index       int
-	arrayLenght int
+	arrayLength int
 }
 
 func (ioobe IndexOutOfBoundsError) Error() string {
-	panic(fmt.Sprintf("%d is not a valid index[0,%d] for the array", ioobe.index, ioobe.arrayLenght))
+	panic(fmt.Sprintf("%d is not a valid index[0,%d] for the array", ioobe.index, ioobe.arrayLength))
 }
 
 func Encode(ba *[]byte, allowControlCharacters bool) string {
