@@ -93,3 +93,4 @@ modules.xml
 
 # End of https://www.toptal.com/developers/gitignore/api/Intellij+all
 /go.sum
+/bais/coverage.txt
