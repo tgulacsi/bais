@@ -1,6 +1,6 @@
 # ByteArrayInString
 
-## Go implemenation of ByteArrayInString
+## Go implemenation of [ByteArrayInString](http://ecsharp.net/doc/code/classLoyc_1_1ByteArrayInString.html#details) from the "Enhanced C#" library *Loyc* 
 
 Encodes and decodes BAIS (Byte Array In String) encoding,
 which preserves runs of ASCII characters unchanged. This encoding is
