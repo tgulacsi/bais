@@ -1,6 +1,8 @@
 language: go
 go:
-  - 1.x
+  - 1.14.x
+  - 1.15.x
+  - tip
 notificaitons:
   email:
     recipients: jarrod@vertigrated.com
@@ -9,6 +11,6 @@ install:
   - go get -u github.com/jarrodhroberson/bais
   - go get -t -v ./...
 script:
-  - courtney -e
+  - ./go.test.sh
 after_success:
   - bash <(curl -s https://codecov.io/bash)
