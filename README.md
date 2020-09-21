@@ -1,5 +1,9 @@
 # ByteArrayInString
 
+>>> This is just a direct as possible *port* of the *Java* version of the *C#* version.
+>>> It is not optomized for Go specifically. I am sure there are more idiomatic *Go* enhancements that 
+>>> be made. Pull requests for such edits are welcome!
+
 ## Go implemenation of [ByteArrayInString](http://ecsharp.net/doc/code/classLoyc_1_1ByteArrayInString.html#details) from the "Enhanced C#" library *Loyc* 
 
 Encodes and decodes BAIS (Byte Array In String) encoding,
