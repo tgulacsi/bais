@@ -33,6 +33,14 @@ func Test_Encode(t *testing.T) {
 		{
 			name: "Cat\\b`@iE?tEB!CD",
 			args: args{
+				ba:                     &[]byte{67, 97, 116, 128, 10, 69, 255, 65, 66, 67, 68},
+				allowControlCharacters: true,
+			},
+			want: "Cat\b`@iE?tEB!CD",
+		},
+		{
+			name: "testdata/test.jpg",
+			args: args{
 				ba: func() *[]byte {
 					content, err := ioutil.ReadFile("../testdata/test.jpg")
 					if err != nil {
@@ -40,14 +48,6 @@ func Test_Encode(t *testing.T) {
 					}
 					return &content
 				}(),
-				allowControlCharacters: false,
-			},
-			want: "Cat\b`@iE?tEB!CD",
-		},
-		{
-			name: "testdata/test.jpg",
-			args: args{
-				ba:                     &[]byte{},
 				allowControlCharacters: false,
 			},
 			want: func() string {
