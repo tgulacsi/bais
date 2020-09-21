@@ -1,5 +1,10 @@
 # ByteArrayInString
 
+[![Build Status](https://travis-ci.org/jarrodhroberson/bais.svg?branch=master)](https://travis-ci.org/jarrodhroberson/bais) [![Go Report Card](https://goreportcard.com/badge/github.com/jarrodhroberson/bais)](https://goreportcard.com/report/github.com/jarrodhroberson/bais)
+[![codecov](https://img.shields.io/badge/codecov-100%25-brightgreen.svg)](https://codecov.io/gh/jarrodhroberson/bais)
+![stability-stable](https://img.shields.io/badge/stability-stable-brightgreen.svg)
+[![Sourcegraph](https://sourcegraph.com/github.com/jarrodhroberson/bais/-/badge.svg)](https://sourcegraph.com/github.com/jarrodhroberson/bais?badge)
+
 > This is just a direct as possible *port* of the *Java* version of the *C#* version.
 > It is not optomized for Go specifically. I am sure there are more idiomatic *Go* enhancements that 
 > be made. Pull requests for such edits are welcome!
