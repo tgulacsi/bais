@@ -34,7 +34,7 @@ func Test_Encode(t *testing.T) {
 			name: "Cat\\b`@iE?tEB!CD",
 			args: args{
 				ba: func() *[]byte {
-					content, err := ioutil.ReadFile("testdata/test.jpg")
+					content, err := ioutil.ReadFile("../testdata/test.jpg")
 					if err != nil {
 						t.Errorf("Could not read testdata/test.jpg")
 					}
@@ -51,7 +51,7 @@ func Test_Encode(t *testing.T) {
 				allowControlCharacters: false,
 			},
 			want: func() string {
-				want, err := ioutil.ReadFile("testdata/test.jpg.bais")
+				want, err := ioutil.ReadFile("../testdata/test.jpg.bais")
 				if err != nil {
 					t.Errorf("Could not read testdata/test.jpg.bais")
 				}
@@ -96,7 +96,7 @@ func Test_Decode(t *testing.T) {
 			name: "test.jpg.bais",
 			args: args{
 				s: func() string {
-					content, err := ioutil.ReadFile("testdata/test.jpg.bais")
+					content, err := ioutil.ReadFile("../testdata/test.jpg.bais")
 					if err != nil {
 						t.Errorf("Could not read testdata/test.jpg.bais")
 					}
@@ -104,7 +104,7 @@ func Test_Decode(t *testing.T) {
 				}(),
 			},
 			want: func() []byte {
-				want, err := ioutil.ReadFile("testdata/test.jpg")
+				want, err := ioutil.ReadFile("../testdata/test.jpg")
 				if err != nil {
 					t.Errorf("Could not read testdata/test.jpg")
 				}
