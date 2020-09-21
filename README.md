@@ -31,20 +31,20 @@ character is encountered. Base-64 mode ends, returning to ASCII, when a
 
 For example:
 ```
-  b := byte[]{ 67, 97, 116, 128, 10, 69, 255, 65, 66, 67, 68 };
-  bytes.Equal(bais.Encode(b), "Cat\b`@iE?tEB!CD"), b)
-  "Cat\b`@iE?tEB!CD" = bais.Decode(bais.Encode(b))
+b := byte[]{ 67, 97, 116, 128, 10, 69, 255, 65, 66, 67, 68 };
+bytes.Equal(bais.Encode(b), "Cat\b`@iE?tEB!CD"), b)
+"Cat\b`@iE?tEB!CD" = bais.Decode(bais.Encode(b))
 ```
 
 A byte sequence such as 128, 10, 69, 255 can be encoded in base 64 as 
 illustrated:
 ```
-             ---128---    ---10----    ---69----  ---255---  
-  Bytes:     1000 0000    0000 1010    0100 0101  1111 1111  
-  Base 64:   100000   000000   101001    000101   111111   110000
-  Encoded: 01100000 01000000 01101001  01000101 01111111 01110000
-           ---96--- ---64--- --105---  ---69--- --127--- --112---
-              `        @        i         E        ~        p
+           ---128---    ---10----    ---69----  ---255---  
+Bytes:     1000 0000    0000 1010    0100 0101  1111 1111  
+Base 64:   100000   000000   101001    000101   111111   110000
+Encoded: 01100000 01000000 01101001  01000101 01111111 01110000
+         ---96--- ---64--- --105---  ---69--- --127--- --112---
+            `        @        i         E        ~        p
 ```
 
 An interesting property of this base-64 encoding is that when it encodes
