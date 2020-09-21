@@ -121,7 +121,7 @@ func encodeBase64Digit(b int32) int32 {
 	return (b+1)&63 + 63
 }
 
-func Decode(s string) []byte {
+func Decode(s string) ([]byte, error) {
 	bb := make([]byte, 0, len(s))
 	sb := []byte(s)
 	for i := 0; i < len(sb); i++ {
@@ -129,8 +129,11 @@ func Decode(s string) []byte {
 			i++ // skip \b
 			for {
 				cur := int32(sb[i]) & 0xFF
-				if i >= len(sb) || (cur < 63 || cur > 126) {
-					panic(fmt.Errorf("%s can not be interpreted as a BAIS array", s))
+				if i >= len(sb) {
+					return []byte{}, fmt.Errorf("index %d is greater than number of bytes in %s (%d)", i, s, len(s))
+				}
+				if cur < 63 || cur > 126 {
+					return []byte{}, fmt.Errorf("current byte (%d) is not ASCII, was expecting %[1]d to be > 63 and < 126", cur)
 				}
 				digit := (cur - 64) & 63
 				zeros := 16 - 6
@@ -155,8 +158,11 @@ func Decode(s string) []byte {
 					i++
 				}
 
-				if (accum&0xFF00) != 0 || (i < len(sb) && sb[i] != '!') {
-					panic(fmt.Errorf("%s can not be interpreted as a BAIS array", s))
+				if accum&0xFF00 != 0 {
+					return []byte{}, fmt.Errorf(`%d & 0xFF00 != 0`, accum)
+				}
+				if i < len(sb) && sb[i] != '!' {
+					return []byte{}, fmt.Errorf(`%s expecting '!' got %d`, sb[i])
 				}
 				i++
 
@@ -165,21 +171,13 @@ func Decode(s string) []byte {
 					i++
 				}
 				if i >= len(sb) {
-					return bb[0:]
+					return bb[0:], nil
 				}
 			}
 		}
 		bb = append(bb, sb[i])
 	}
-	return bb[0:]
-}
-
-func decodeBase64Digit(b byte) int32 {
-	if b >= 63 && b <= 126 {
-		return int32((b - 64) & 63)
-	} else {
-		return -1
-	}
+	return bb[0:], nil
 }
 
 func getByte(bytes []byte, index int) (b byte, nextIndex int) {
