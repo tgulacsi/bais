@@ -1,14 +1,12 @@
 language: go
 go:
-  - 1.14.x
   - 1.15.x
-  - tip
 notificaitons:
   email:
     recipients: jarrod@vertigrated.com
     on_failure: always
 install:
-  - go get -t -v ./...
+  - go get -t -v ./.../encoding/bais
 script:
   - go test -race -coverprofile=coverage.txt -covermode=atomic
 after_success:
