@@ -70,7 +70,7 @@ func Decode(s string) ([]byte, error) {
 	bb := make([]byte, 0, len(s))
 	sb := []byte(s)
 	for i := 0; i < len(sb); i++ {
-		if sb[i] == '\b' {
+		if sb[i] == byte('\b') {
 			i++ // skip \b (backspace)
 			for {
 				cur := int32(sb[i]) & 0xFF
@@ -106,18 +106,19 @@ func Decode(s string) ([]byte, error) {
 				if accum&0xFF00 != 0 {
 					return []byte{}, fmt.Errorf(`%d & 0xFF00 != 0`, accum)
 				}
-				if i < len(sb) && sb[i] != '!' {
+				if i < len(sb) && sb[i] != byte('!') {
 					return []byte{}, fmt.Errorf(`expecting '!' got %d`, sb[i])
 				}
 				i++
 
-				for i < len(sb) && sb[i] != '\b' {
+				for i < len(sb) && sb[i] != byte('\b') {
 					bb = append(bb, sb[i])
 					i++
 				}
 				if i >= len(sb) {
 					return bb[0:], nil
 				}
+				i++
 			}
 		}
 		bb = append(bb, sb[i])
