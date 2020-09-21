@@ -1,5 +1,6 @@
 # ByteArrayInString
 
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/jarrodhroberson/bais)](https://pkg.go.dev/github.com/jarrodhroberson/bais)
 [![Build Status](https://travis-ci.org/jarrodhroberson/bais.svg?branch=master)](https://travis-ci.org/jarrodhroberson/bais) [![Go Report Card](https://goreportcard.com/badge/github.com/jarrodhroberson/bais)](https://goreportcard.com/report/github.com/jarrodhroberson/bais)
 [![codecov](https://img.shields.io/badge/codecov-100%25-brightgreen.svg)](https://codecov.io/gh/jarrodhroberson/bais)
 ![stability-stable](https://img.shields.io/badge/stability-stable-brightgreen.svg)
