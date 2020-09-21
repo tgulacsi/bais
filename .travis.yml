@@ -8,7 +8,6 @@ notificaitons:
     recipients: jarrod@vertigrated.com
     on_failure: always
 install:
-  - go get -u github.com/jarrodhroberson/bais
   - go get -t -v ./...
 script:
   - go test -race -coverprofile=coverage.txt -covermode=atomic
