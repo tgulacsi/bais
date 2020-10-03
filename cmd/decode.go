@@ -1,11 +1,12 @@
 package cmd
 
 import (
+	"io/ioutil"
+	"os"
+
 	"github.com/jarrodhroberson/bais/bais"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"io/ioutil"
-	"os"
 )
 
 // decodeCmd represents the decode command
@@ -44,7 +45,7 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			panic(err)
 		}
-		decoded, err := bais.Decode(string(content))
+		decoded, err := bais.Decode(nil, string(content))
 		if err != nil {
 			panic(err)
 		}

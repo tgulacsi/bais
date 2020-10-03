@@ -2,19 +2,13 @@ package bais
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"testing"
 )
 
-func stringToByteArrayPointer(s string) *[]byte {
-	r := []byte(s)
-	return &r
-}
-
-func Test_Encode(t *testing.T) {
+func TestEncode(t *testing.T) {
 	type args struct {
-		ba                     *[]byte
+		ba                     []byte
 		allowControlCharacters bool
 	}
 	tests := []struct {
@@ -25,12 +19,12 @@ func Test_Encode(t *testing.T) {
 		{
 			name: "all ascii",
 			args: args{
-				ba: func() *[]byte {
+				ba: func() []byte {
 					bytes := make([]byte, 64)
 					for i := 63; i < 127; i++ {
 						bytes[i-63] = byte(i)
 					}
-					return &bytes
+					return bytes
 				}(),
 				allowControlCharacters: false,
 			},
@@ -45,7 +39,7 @@ func Test_Encode(t *testing.T) {
 		{
 			name: "Cat\\b`@iE?tEB!CD",
 			args: args{
-				ba:                     &[]byte{67, 97, 116, 128, 10, 69, 255, 65, 66, 67, 68},
+				ba:                     []byte{67, 97, 116, 128, 10, 69, 255, 65, 66, 67, 68},
 				allowControlCharacters: true,
 			},
 			want: "Cat\b`@iE?tEB!CD",
@@ -53,12 +47,12 @@ func Test_Encode(t *testing.T) {
 		{
 			name: "testdata/test.jpg",
 			args: args{
-				ba: func() *[]byte {
+				ba: func() []byte {
 					content, err := ioutil.ReadFile("../testdata/test.jpg")
 					if err != nil {
 						t.Errorf("Could not read testdata/test.jpg")
 					}
-					return &content
+					return content
 				}(),
 				allowControlCharacters: false,
 			},
@@ -74,14 +68,21 @@ func Test_Encode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Encode(tt.args.ba, tt.args.allowControlCharacters); got != tt.want {
-				fmt.Println(string(got[:]))
-				t.Errorf("ByteArrayInString() = %v, want %v", got, tt.want)
+				i := 0
+				for ; i < len(tt.want) && i < len(got); i++ {
+					if got[i] != tt.want[i] {
+						t.Errorf("First mismatch is at %d: got %v, want %v", i, got[i], tt.want[i])
+						i++
+						break
+					}
+				}
+				t.Errorf("got\n%v,\n\twant\n%v", got[:i], tt.want[:i])
 			}
 		})
 	}
 }
 
-func Test_Decode(t *testing.T) {
+func TestDecode(t *testing.T) {
 	type args struct {
 		s string
 	}
@@ -138,8 +139,10 @@ func Test_Decode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := Decode(tt.args.s); !bytes.Equal(got, tt.want) {
-				t.Errorf("Decode() = %v, want %v", got, tt.want)
+			if got, err := Decode(nil, tt.args.s); !bytes.Equal(got, tt.want) {
+				t.Errorf("got\n%v,\n\twant\n%v", got, tt.want)
+			} else if err != nil {
+				t.Error(err)
 			}
 		})
 	}

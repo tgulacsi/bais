@@ -4,81 +4,73 @@ import (
 	"fmt"
 )
 
-type IndexOutOfBoundsError struct {
-	index       int
-	arrayLength int
-}
-
 // Encode encodes a []byte into an alternative Base64 encoding as described above.
-func Encode(ba *[]byte, allowControlCharacters bool) string {
-	bytes := *ba
-	arrayLength := len(bytes)
-	sb := make([]byte, 0, arrayLength*3)
-	i := 0
-	var b byte
-	for i < arrayLength {
-		if isAscii(bytes, i, allowControlCharacters) {
-			b, i = getByte(bytes, i)
-			sb = append(sb, b)
-		} else {
-			b, i = getByte(bytes, i)
-			sb = append(sb, byte('\b'))
-			for ; ; b, i = getByte(bytes, i) {
-				var accum int32
-				accum = int32(b)
-				if i < arrayLength {
-					b, i = getByte(bytes, i)
-					accum = (accum << 8) | int32(b)
-					if i < arrayLength {
-						b, i = getByte(bytes, i)
-						accum = accum<<8 | int32(b)
-						sb = append(sb, byte(encode(accum>>18)))
-						sb = append(sb, byte(encode(accum>>12)))
-						sb = append(sb, byte(encode(accum>>6)))
-						sb = append(sb, byte(encode(accum)))
-						if i >= arrayLength {
-							break
-						}
-					} else {
-						sb = append(sb, byte(encode(accum>>10)))
-						sb = append(sb, byte(encode(accum>>4)))
-						sb = append(sb, byte(encode(accum<<2)))
-						break
-					}
-				} else {
-					sb = append(sb, byte(encode(accum>>2)))
-					sb = append(sb, byte((encode(accum << 4))))
+func Encode(p []byte, allowControlCharacters bool) string {
+	sb := make([]byte, 0, 3*len(p))
+
+	for i := 0; i < len(p); i++ {
+		if isAscii(p[i], allowControlCharacters) {
+			sb = append(sb, p[i])
+			continue
+		}
+
+		sb = append(sb, byte('\b'))
+		for ; i < len(p); i++ {
+			var accum int32
+			accum = int32(p[i])
+			if i == len(p)-1 { // last byte
+				sb = append(sb, encode(accum>>2))
+				sb = append(sb, (encode(accum << 4)))
+				break
+			} else {
+				i++
+				accum = accum<<8 | int32(p[i])
+				if i == len(p)-1 {
+					sb = append(sb, encode(accum>>10))
+					sb = append(sb, encode(accum>>4))
+					sb = append(sb, encode(accum<<2))
 					break
 				}
-				if isAscii(bytes, i, allowControlCharacters) &&
-					(i+1 >= len(bytes) || isAscii(bytes, i, allowControlCharacters)) &&
-					(i+2 >= len(bytes) || isAscii(bytes, i, allowControlCharacters)) {
-					sb = append(sb, byte('!'))
+				i++
+				accum = accum<<8 | int32(p[i])
+				sb = append(sb, encode(accum>>18))
+				sb = append(sb, encode(accum>>12))
+				sb = append(sb, encode(accum>>6))
+				sb = append(sb, encode(accum))
+				if i == len(p)-1 {
 					break
 				}
 			}
+			if isAscii(p[i+1], allowControlCharacters) &&
+				(i+2 >= len(p) || isAscii(p[i+1], allowControlCharacters)) &&
+				(i+3 >= len(p) || isAscii(p[i+1], allowControlCharacters)) {
+				sb = append(sb, '!')
+				break
+			}
 		}
 	}
-	return string(sb[0:])
+	return string(sb)
 }
 
-func encode(b int32) int32 {
-	return (b+1)&63 + 63
+func encode(b int32) byte {
+	return byte((b+1)&63 + 63)
+}
+func isAscii(b byte, allowControlChars bool) bool {
+	return b < 127 && (b >= 32 || (allowControlChars && b != '\b'))
 }
 
-func Decode(s string) ([]byte, error) {
-	bb := make([]byte, 0, len(s))
+func Decode(bb []byte, s string) ([]byte, error) {
 	sb := []byte(s)
 	for i := 0; i < len(sb); i++ {
-		if sb[i] == byte('\b') {
+		if sb[i] == '\b' {
 			i++ // skip \b (backspace)
 			for {
-				cur := int32(sb[i]) & 0xFF
+				cur := int32(sb[i])
 				if i >= len(sb) {
-					return []byte{}, fmt.Errorf("index %d is greater than number of bytes in %s (%d)", i, s, len(s))
+					return bb, fmt.Errorf("index %d is greater than number of bytes in %s (%d)", i, s, len(s))
 				}
 				if cur < 63 || cur > 126 {
-					return []byte{}, fmt.Errorf("current byte (%d) is not ASCII, was expecting %[1]d to be > 63 and < 126", cur)
+					return bb, fmt.Errorf("current byte (%d) is not ASCII, was expecting %[1]d to be > 63 and < 126", cur)
 				}
 				digit := (cur - 64) & 63
 				zeros := 16 - 6
@@ -88,7 +80,7 @@ func Decode(s string) ([]byte, error) {
 					if i >= len(sb) {
 						break
 					}
-					cur = int32(sb[i]) & 0xFF
+					cur = int32(sb[i])
 					if cur < 63 || cur > 126 {
 						break
 					}
@@ -104,37 +96,24 @@ func Decode(s string) ([]byte, error) {
 				}
 
 				if accum&0xFF00 != 0 {
-					return []byte{}, fmt.Errorf(`%d & 0xFF00 != 0`, accum)
+					return bb, fmt.Errorf(`%d & 0xFF00 != 0`, accum)
 				}
-				if i < len(sb) && sb[i] != byte('!') {
-					return []byte{}, fmt.Errorf(`expecting '!' got %d`, sb[i])
+				if i < len(sb) && sb[i] != '!' {
+					return bb, fmt.Errorf(`expecting '!' got %d`, sb[i])
 				}
 				i++
 
-				for i < len(sb) && sb[i] != byte('\b') {
+				for i < len(sb) && sb[i] != '\b' {
 					bb = append(bb, sb[i])
 					i++
 				}
 				if i >= len(sb) {
-					return bb[0:], nil
+					return bb, nil
 				}
 				i++
 			}
 		}
 		bb = append(bb, sb[i])
 	}
-	return bb[0:], nil
-}
-
-func getByte(bytes []byte, index int) (b byte, nextIndex int) {
-	if index < len(bytes) {
-		return bytes[index] & 0xFF, index + 1
-	} else {
-		panic(&IndexOutOfBoundsError{index, len(bytes)})
-	}
-}
-
-func isAscii(bytes []byte, index int, allowControlChars bool) bool {
-	b := bytes[index]
-	return b < 127 && (b >= 32 || (allowControlChars && b != '\b'))
+	return bb, nil
 }

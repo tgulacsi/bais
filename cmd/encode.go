@@ -1,11 +1,12 @@
 package cmd
 
 import (
+	"io/ioutil"
+	"os"
+
 	"github.com/jarrodhroberson/bais/bais"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"io/ioutil"
-	"os"
 )
 
 // encodeCmd represents the encode command
@@ -38,7 +39,7 @@ var encodeCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		encoded := bais.Encode(&content, viper.GetBool("allow-control-characters"))
+		encoded := bais.Encode(content, viper.GetBool("allow-control-characters"))
 		_, err = outputFile.Write([]byte(encoded))
 		if err != nil {
 			panic(err)
